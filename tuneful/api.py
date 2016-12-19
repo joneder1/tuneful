@@ -30,7 +30,7 @@ def songs_get():
     #returns songs in JSON
     data = json.dumps([song.as_dictionary() for song in songs])
     return Response(data, 200, mimetype="application/json")
-
+    
 @app.route("/api/songs", methods=["POST"])
 @decorators.accept("application/json")
 @decorators.require("application/json")
@@ -62,10 +62,27 @@ def song_post():
     return Response(data, 201, headers=headers,
                 mimetype="application/json")
 
-file1 = models.File(filename="test1.mp3")
-file2 = models.File(filename="test2.mp3")
-song1 = models.Song(file=file1)
-song2 = models.Song(file=file2)
-        
+@app.route("/uploads/<filename>", methods=["GET"])
+def uploaded_file(filename):
+    return send_from_directory(upload_path(), filename)
+    
+@app.route("/api/files", methods=["POST"])
+@decorators.require("multipart/form-data")
+@decorators.accept("application/json")
+def file_post():
+    file = request.files.get("file")
+    if not file:
+        data = {"message": "Could not find file data"}
+        return Response(json.dumps(data), 422, mimetype="application/json")
+
+    filename = secure_filename(file.filename)
+    db_file = models.File(filename=filename)
+    session.add(db_file)
+    session.commit()
+    file.save(upload_path(filename))
+
+    data = db_file.as_dictionary()
+    return Response(json.dumps(data), 201, mimetype="application/json")    
+    
 
 
