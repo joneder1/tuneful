@@ -82,7 +82,6 @@ class TestAPI(unittest.TestCase):
             "/api/songs/1")
             
         data = json.loads(response.data.decode("ascii"))
-        
         self.assertEqual(data["id"], 1)
         self.assertEqual(data["file"]["name"], "post_song.mp3")
         

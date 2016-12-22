@@ -35,7 +35,6 @@ def songs_get():
 @decorators.accept("application/json")
 @decorators.require("application/json")
 def song_post():
-    """Add a new song to the database"""
     data = request.json
     # Check that the JSON supplied is valid
     # If not you return a 422 Unprocessable Entity
